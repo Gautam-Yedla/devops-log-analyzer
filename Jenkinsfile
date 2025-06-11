@@ -43,6 +43,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'log-analyzer:latest'
+        ENV_FILE = '.env'
     }
 
     stages {
@@ -57,53 +58,32 @@ pipeline {
 
         stage('Run Analysis') {
             steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'JenkinsGautamAdmin',
-                        usernameVariable: 'EMAIL_USER',
-                        passwordVariable: 'EMAIL_PASS'
-                    )
-                ]) {
-                    bat """
-                        echo Running analysis container with image: %DOCKER_IMAGE%
-                        docker run ^
-                            -e EMAIL_USER=%EMAIL_USER% ^
-                            -e EMAIL_PASS=%EMAIL_PASS% ^
-                            %DOCKER_IMAGE%
-                    """
-                }
+                bat """
+                    echo Running analysis with env file: %ENV_FILE%
+                    docker run --env-file %ENV_FILE% %DOCKER_IMAGE%
+                """
             }
         }
 
         stage('Run Tests') {
             steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'JenkinsGautamAdmin',
-                        usernameVariable: 'EMAIL_USER',
-                        passwordVariable: 'EMAIL_PASS'
-                    )
-                ]) {
-                    bat """
-                        echo Running tests in container using image: %DOCKER_IMAGE%
-                        docker run ^
-                            -e EMAIL_USER=%EMAIL_USER% ^
-                            -e EMAIL_PASS=%EMAIL_PASS% ^
-                            %DOCKER_IMAGE% ^
-                            pytest tests/ --cov=app --cov-report=term-missing
-                    """
-                }
+                bat """
+                    echo Running tests with env file: %ENV_FILE%
+                    docker run --env-file %ENV_FILE% %DOCKER_IMAGE% pytest tests/ --cov=app --cov-report=term-missing
+                """
             }
         }
+
         stage('Cleanup') {
             steps {
                 bat """
-                    echo Cleaning up Docker images
+                    echo Cleaning up Docker image
                     docker rmi %DOCKER_IMAGE%
                 """
             }
         }
     }
+
     post {
         always {
             echo 'Pipeline completed.'
@@ -115,7 +95,7 @@ pipeline {
             echo 'Pipeline failed.'
         }
         cleanup {
-            echo 'Cleaning up resources...'
+            echo 'Pruning unused Docker resources...'
             bat 'docker system prune -f'
         }
     }
