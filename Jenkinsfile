@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git 'https://github.com/your-username/devops-log-analyzer.git'
+                git 'https://github.com/Gautam-Yedla/devops-log-analyzer.git'
             }
         }
         stage('Build Docker Image') {
