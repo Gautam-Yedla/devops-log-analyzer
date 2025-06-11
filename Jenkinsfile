@@ -34,7 +34,6 @@
 //     }
 // }
 
-
 pipeline {
     agent any
 
@@ -42,27 +41,29 @@ pipeline {
         git 'Default'
     }
 
-    // environment {
-    //     DOCKER_IMAGE = 'log-analyzer'
-    // }
+    environment {
+        DOCKER_IMAGE = 'log-analyzer:latest'
+    }
 
     stages {
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t ${DOCKER_IMAGE} ."
+                bat "docker build -t %DOCKER_IMAGE% ."
             }
         }
+
         stage('Run Analysis') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'JenkinsGautamAdmin', usernameVariable: 'EMAIL_USER', passwordVariable: 'EMAIL_PASS')]) {
-                    bat "\"docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% ${DOCKER_IMAGE}\""
+                    bat "docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% %DOCKER_IMAGE% python log_analyzer.py"
                 }
             }
         }
+
         stage('Run Tests') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'JenkinsGautamAdmin', usernameVariable: 'EMAIL_USER', passwordVariable: 'EMAIL_PASS')]) {
-                    bat "\"docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% ${DOCKER_IMAGE} pytest --cov=app --cov-report=term-missing\""
+                    bat "docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% %DOCKER_IMAGE% pytest tests/ --cov=app --cov-report=term-missing"
                 }
             }
         }
