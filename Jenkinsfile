@@ -8,12 +8,12 @@ pipeline {
         // }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t log-analyzer .'
+                bat 'docker build -t log-analyzer .'
             }
         }
         stage('Run Analysis') {
             steps {
-                sh 'docker run log-analyzer'
+                bat 'docker run log-analyzer'
             }
         }
     }
