@@ -73,15 +73,6 @@ pipeline {
                 """
             }
         }
-
-        stage('Cleanup') {
-            steps {
-                bat """
-                    echo Cleaning up Docker image
-                    docker rmi %DOCKER_IMAGE%
-                """
-            }
-        }
     }
 
     post {
