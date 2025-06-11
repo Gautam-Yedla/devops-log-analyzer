@@ -1,9 +1,13 @@
 pipeline {
     agent any
 
+    tools {
+      git 'Default'
+    }
+
     environment {
-        EMAIL_USER = credentials('jenkins-email-user')   // ID in Jenkins credentials
-        EMAIL_PASS = credentials('jenkins-email-pass')   // ID in Jenkins credentials
+        EMAIL_USER = credentials('JenkinsGautamAdmin')   // ID in Jenkins credentials
+        EMAIL_PASS = credentials('JenkinsGautamAdmin')   // ID in Jenkins credentials
     }
 
     stages {
