@@ -18,7 +18,6 @@
 #     print("\n⚠️ Warnings:\n", *warns, sep="\n")
 #     print("\n❌ Errors:\n", *errs, sep="\n")
 
-
 import re
 import os
 try:
@@ -53,8 +52,8 @@ def main(path="sample_logs/app.log"):
 
     body = f"Warnings:\n" + "\n".join(warns) + "\n\nErrors:\n" + "\n".join(errs)
     send_email(
-        subject,
-        body,
+        subject=subject,
+        body=body,
         to_email=os.getenv("EMAIL_TO"),
         from_email=os.getenv("EMAIL_FROM"),
         password=os.getenv("EMAIL_PASS")

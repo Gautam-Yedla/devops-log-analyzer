@@ -33,4 +33,10 @@ def test_send_email_mock(monkeypatch):
     monkeypatch.setattr("smtplib.SMTP", MockSMTP)
 
     from app.utils.email_alerts import send_email
-    send_email("Test", "Body", "to@example.com", "from@example.com", "dummy-pass")
+    send_email(
+        subject="Test",
+        body="Body",
+        to_email="to@example.com",
+        from_email="from@example.com",
+        password="dummy-pass"
+    )
