@@ -1,4 +1,3 @@
-
 # 🛠️ DevOps Log Analyzer
 
 ![CI](https://github.com/Gautam-Yedla/devops-log-analyzer/actions/workflows/ci.yml/badge.svg)
