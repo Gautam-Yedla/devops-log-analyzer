@@ -1,8 +1,12 @@
 FROM python:3.11-slim
 
 WORKDIR /app
-COPY app/ ./
-COPY tests/ ./tests/
+ENV PYTHONPATH=/app
+
+COPY app/ ./app
+COPY tests/ ./tests
+
+
 COPY requirements.txt ./
 
 COPY .env .env
@@ -10,28 +14,21 @@ COPY .env .env
 RUN pip install -r requirements.txt
 
 
-ENV PYTHONPATH=/app
-
-CMD ["python", "main.py"]
-
+CMD ["python", "app/main.py"]
 
 # FROM python:3.11-slim
 
+# # Set working directory inside the container
 # WORKDIR /app
 
-# # Copy everything from app/ into /app/app/
-# COPY app/ app/
-# COPY requirements.txt ./
-# COPY .env .env
-
-# COPY app/sample_logs/ app/sample_logs/
-
-# # Install dependencies
-# RUN pip install -r requirements.txt
-# RUN pip install --no-cache-dir -r requirements.txt
-
-# # Set PYTHONPATH to recognize 'app' as a package
+# # Set PYTHONPATH so Python knows where to find your modules
 # ENV PYTHONPATH=/app
 
-# # Run the main script
+# # Copy everything from local directory into the container
+# COPY . .
+
+# # Install dependencies
+# RUN pip install --no-cache-dir -r requirements.txt
+
+# # Default command: run your main app
 # CMD ["python", "app/main.py"]

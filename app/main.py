@@ -37,8 +37,12 @@ def analyze_log(file_path):
                 warnings.append(line.strip())
     return errors, warnings
 
-def main(path="sample_logs/app.log"):
+def main(path=None):
     load_dotenv()
+    if path is None:
+        # Use absolute path relative to this file
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.join(base_dir, "sample_logs", "app.log")
     errs, warns = analyze_log(path)
 
     print("\n⚠️ Warnings:\n", *warns, sep="\n")
