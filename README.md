@@ -1,48 +1,35 @@
-# DevOps Log Analyzer
+
+# 🛠️ DevOps Log Analyzer
 
 ![CI](https://github.com/Gautam-Yedla/devops-log-analyzer/actions/workflows/ci.yml/badge.svg)
 
-A log analyzer tool built using Python, Docker, Jenkins, and GitHub Actions. Automatically sends email alerts on errors or success after log analysis.
-
-...
-
-A professional and clear `README.md` content for My **DevOps Log Analyzer** project. It covers:
-
-* What the project is
-* What you learned
-* Technologies used
-* How everything works
-* How to run it locally and in Jenkins
-
----
-
-```markdown
-# 🛠️ DevOps Log Analyzer
-
-A simple yet complete DevOps pipeline that analyzes application logs for errors and warnings using a Python script. This project demonstrates full CI/CD implementation using GitHub, Docker, and Jenkins.
+A production-style DevOps pipeline that analyzes log files for errors and warnings using Python, sends email alerts on findings, and integrates with Docker, Jenkins, and GitHub Actions for full CI/CD automation.
 
 ---
 
 ## 📌 Project Objective
 
-To build an automated system that:
-- Analyzes log files for "ERROR" and "WARNING" entries
-- Runs inside a Docker container
-- Is integrated with a Jenkins CI/CD pipeline
-- Demonstrates end-to-end DevOps workflow
+To build an automated, end-to-end DevOps workflow that:
+
+- Analyzes logs for `ERROR` and `WARNING` patterns
+- Sends **email alerts** for both errors and successful analysis
+- Runs inside a **Docker container**
+- Automatically builds and tests using **Jenkins** and **GitHub Actions**
+- Demonstrates core DevOps concepts in action
 
 ---
 
-## ✅ What We Learned & Implemented
+## ✅ What I Built & Learned
 
-| Area | What We Did |
-|------|-------------|
-| **Python Scripting** | Wrote a Python script to parse logs and print warnings/errors |
-| **Docker** | Containerized the application using a lightweight Python image |
-| **Jenkins** | Set up a multistage pipeline that checks out code, builds the image, and runs the analysis |
-| **Git & GitHub** | Used Git for version control and GitHub as remote repository |
-| **CI/CD Workflow** | Automated the entire workflow from code pull to execution |
-| **Debugging & Logs** | Resolved issues like missing file paths and Docker context handling |
+| Area                  | Highlights                                                                 |
+|-----------------------|---------------------------------------------------------------------------|
+| **Python**            | Built a script that analyzes logs and sends alerts using `smtplib`        |
+| **Docker**            | Containerized the Python app for portability                              |
+| **Jenkins**           | Configured a multistage CI/CD pipeline with automated GitHub webhook      |
+| **GitHub Actions**    | Added CI workflow with test coverage badge                                |
+| **Pytest**            | Implemented unit tests and test coverage reports                          |
+| **Email Integration** | Sent dynamic alerts using `.env` configuration and SMTP                   |
+| **Secrets Handling**  | Managed credentials via `.env` and GitHub Actions secrets                 |
 
 ---
 
@@ -51,8 +38,10 @@ To build an automated system that:
 - 🐍 Python 3.11
 - 🐳 Docker
 - ⚙️ Jenkins
-- 📁 Git & GitHub
-- 🖥️ VS Code (for development)
+- 🔁 Git & GitHub
+- 📬 SMTP (Gmail or custom)
+- ✅ Pytest + Coverage
+- 🚀 GitHub Actions
 
 ---
 
@@ -62,12 +51,18 @@ To build an automated system that:
 
 devops-log-analyzer/
 ├── app/
-│   ├── main.py          # Main log analyzer script
-│   ├── utils.py         # Helper (optional)
+│   ├── main.py               # Log analysis and email alerts
+│   ├── utils/
+│   │   └── email\_alerts.py   # Sends email notifications
 │   └── sample\_logs/
-│       └── app.log      # Sample log file
+│       └── app.log           # Example log input
+├── tests/
+│   └── test\_main.py          # Pytest test cases
+├── .env                      # Email credentials (ignored in Git)
+├── .gitignore
 ├── Dockerfile
 ├── Jenkinsfile
+├── ci.yml                    # GitHub Actions CI
 ├── requirements.txt
 └── README.md
 
@@ -75,27 +70,37 @@ devops-log-analyzer/
 
 ---
 
-## 🚀 How to Run Locally
+## 🚀 How to Run Locally (with Docker)
 
-1. Clone the repo:
+1. Clone the repository:
+
    ```bash
    git clone https://github.com/Gautam-Yedla/devops-log-analyzer.git
    cd devops-log-analyzer
 ````
 
-2. Build the Docker image:
+2. Create a `.env` file with email credentials:
+
+   ```env
+   EMAIL_USER=your_email@gmail.com
+   EMAIL_PASS=your_password
+   EMAIL_FROM=your_email@gmail.com
+   EMAIL_TO=recipient@example.com
+   ```
+
+3. Build the Docker image:
 
    ```bash
    docker build -t log-analyzer .
    ```
 
-3. Run the container:
+4. Run the container:
 
    ```bash
-   docker run -it log-analyzer
+   docker run --env-file .env log-analyzer
    ```
 
-4. Output:
+5. Example Output:
 
    ```text
    ⚠️ Warnings:
@@ -103,45 +108,82 @@ devops-log-analyzer/
 
    ❌ Errors:
    ERROR Failed to connect to database
+
+   📧 Email alert sent successfully!
    ```
 
 ---
 
-## 🤖 Jenkins Pipeline (CI/CD)
+## 🧪 Testing the Application
 
-The `Jenkinsfile` contains a declarative pipeline that does the following:
+1. Run tests with coverage:
 
-* Clones the GitHub repo
-* Builds the Docker image (`log-analyzer`)
-* Runs the container
-* Prints log analysis results in Jenkins console
+   ```bash
+   set PYTHONPATH=.
+   pytest --cov=app --cov-report=term-missing
+   ```
 
-### Sample Output in Jenkins Console:
+2. Example Test Output:
 
-```
-⚠️ Warnings:
-WARNING Disk space is low
+   ```
+   ---------- coverage: platform win32 ----------
+   Name                        Stmts   Miss  Cover
+   ------------------------------------------------
+   app/main.py                    30     10    67%
+   app/utils/email_alerts.py      12      0   100%
+   ------------------------------------------------
+   TOTAL                          42     10    76%
+   ```
 
-❌ Errors:
-ERROR Failed to connect to database
+---
+
+## 🤖 Jenkins Pipeline
+
+The `Jenkinsfile` defines the stages:
+
+* 🧱 Build Docker Image
+* 🔍 Run Log Analysis
+* ✅ Run Pytest with Coverage
+* 🔁 Triggered automatically via GitHub webhook (using ngrok or public Jenkins)
+
+### Jenkins Auto-Trigger Setup:
+
+* Uses **GitHub Webhook** via `https://<ngrok-url>/github-webhook/`
+* `Build Trigger`: "GitHub hook trigger for GITScm polling" is enabled
+
+---
+
+## 🧬 GitHub Actions CI
+
+* Runs on every push to `main`
+* Installs dependencies and runs `pytest` with coverage
+* Automatically updates badge in `README.md`
+
+```yaml
+# .github/workflows/ci.yml
+- uses: actions/checkout@v3
+- uses: actions/setup-python@v4
+- run: pytest --cov=app --cov-report=term-missing
 ```
 
 ---
 
-## 🧪 Future Improvements
+## 🧠 Future Enhancements
 
-* Add test cases and integrate with `pytest`
-* Add email or Slack alerts if errors are found
-* Upload results to a database or dashboard
-* Push Docker image to DockerHub
-* Schedule periodic analysis via Jenkins cron
+* [x] Email alerts
+* [x] Pytest test coverage
+* [x] Jenkins GitHub webhook auto-trigger
+* [ ] Slack or Discord notifications
+* [ ] DockerHub push on successful builds
+* [ ] Schedule Jenkins runs via cron
+* [ ] Central log dashboard (ELK, Loki)
 
 ---
 
-## 🙌 Credits
+## 🙌 Author
 
-Developed by **Gautam Yedla** as a hands-on DevOps learning project.
+**Gautam Yedla**
+A DevOps learner passionate about automation, CI/CD, and infrastructure as code.
 
-```
-
+---
 
