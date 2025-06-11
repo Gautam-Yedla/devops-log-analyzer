@@ -1,35 +1,81 @@
+// pipeline {
+//     agent any
+
+//     tools {
+//       git 'Default'
+//     }
+
+//     environment {
+//         EMAIL_USER = credentials('JenkinsGautamAdmin')   // ID in Jenkins credentials
+//         EMAIL_PASS = credentials('JenkinsGautamAdmin')   // ID in Jenkins credentials
+//     }
+
+//     stages {
+//         // stage('Clone') {
+//         //     steps {
+//         //         git 'https://github.com/Gautam-Yedla/devops-log-analyzer.git'
+//         //     }
+//         // }
+//         stage('Build Docker Image') {
+//             steps {
+//                 bat 'docker build -t log-analyzer .'
+//             }
+//         }
+//         stage('Run Analysis') {
+//             steps {
+//                 bat 'docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% log-analyzer'
+//             }
+//         }
+//         stage('Run Tests') {
+//             steps {
+//                 bat "docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% log-analyzer pytest --cov=app --cov-report=term-missing"
+//             }
+//         }
+//     }
+// }
+
+
+
 pipeline {
     agent any
 
     tools {
-      git 'Default'
+        git 'Default'
     }
 
     environment {
-        EMAIL_USER = credentials('JenkinsGautamAdmin')   // ID in Jenkins credentials
-        EMAIL_PASS = credentials('JenkinsGautamAdmin')   // ID in Jenkins credentials
+        DOCKER_IMAGE = 'log-analyzer'
     }
 
     stages {
-        // stage('Clone') {
-        //     steps {
-        //         git 'https://github.com/Gautam-Yedla/devops-log-analyzer.git'
-        //     }
-        // }
+        stage('Clone') {
+            steps {
+                git url: 'https://github.com/Gautam-Yedla/devops-log-analyzer.git', branch: 'main'
+            }
+        }
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t log-analyzer .'
+                bat "docker build -t ${DOCKER_IMAGE} ."
             }
         }
         stage('Run Analysis') {
             steps {
-                bat 'docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% log-analyzer'
+                withCredentials([usernamePassword(credentialsId: 'JenkinsGautamAdmin', usernameVariable: 'EMAIL_USER', passwordVariable: 'EMAIL_PASS')]) {
+                    bat "docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% ${DOCKER_IMAGE}"
+                }
             }
         }
         stage('Run Tests') {
             steps {
-                bat "docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% log-analyzer pytest --cov=app --cov-report=term-missing"
+                withCredentials([usernamePassword(credentialsId: 'JenkinsGautamAdmin', usernameVariable: 'EMAIL_USER', passwordVariable: 'EMAIL_PASS')]) {
+                    bat "docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% ${DOCKER_IMAGE} pytest --cov=app --cov-report=term-missing"
+                }
             }
+        }
+    }
+    post {
+        always {
+            bat 'docker system prune -f'
         }
     }
 }
