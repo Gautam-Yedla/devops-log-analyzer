@@ -42,16 +42,11 @@ pipeline {
         git 'Default'
     }
 
-    environment {
-        DOCKER_IMAGE = 'log-analyzer'
-    }
+    // environment {
+    //     DOCKER_IMAGE = 'log-analyzer'
+    // }
 
     stages {
-        stage('Clone') {
-            steps {
-                git url: 'https://github.com/Gautam-Yedla/devops-log-analyzer.git', branch: 'main'
-            }
-        }
         stage('Build Docker Image') {
             steps {
                 bat "docker build -t ${DOCKER_IMAGE} ."
@@ -70,11 +65,6 @@ pipeline {
                     bat "\"docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% ${DOCKER_IMAGE} pytest --cov=app --cov-report=term-missing\""
                 }
             }
-        }
-    }
-    post {
-        always {
-            bat 'docker system prune -f'
         }
     }
 }
