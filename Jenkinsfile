@@ -35,7 +35,6 @@
 // }
 
 
-
 pipeline {
     agent any
 
@@ -61,14 +60,14 @@ pipeline {
         stage('Run Analysis') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'JenkinsGautamAdmin', usernameVariable: 'EMAIL_USER', passwordVariable: 'EMAIL_PASS')]) {
-                    bat "docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% ${DOCKER_IMAGE}"
+                    bat "\"docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% ${DOCKER_IMAGE}\""
                 }
             }
         }
         stage('Run Tests') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'JenkinsGautamAdmin', usernameVariable: 'EMAIL_USER', passwordVariable: 'EMAIL_PASS')]) {
-                    bat "docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% ${DOCKER_IMAGE} pytest --cov=app --cov-report=term-missing"
+                    bat "\"docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% ${DOCKER_IMAGE} pytest --cov=app --cov-report=term-missing\""
                 }
             }
         }
