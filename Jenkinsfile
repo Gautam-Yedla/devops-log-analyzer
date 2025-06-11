@@ -1,5 +1,11 @@
 pipeline {
     agent any
+
+    environment {
+        EMAIL_USER = credentials('jenkins-email-user')   // ID in Jenkins credentials
+        EMAIL_PASS = credentials('jenkins-email-pass')   // ID in Jenkins credentials
+    }
+
     stages {
         // stage('Clone') {
         //     steps {
@@ -13,12 +19,12 @@ pipeline {
         }
         stage('Run Analysis') {
             steps {
-                bat 'docker run log-analyzer'
+                bat 'docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% log-analyzer'
             }
         }
         stage('Run Tests') {
             steps {
-                bat 'docker run log-analyzer pytest --cov=app --cov-report=term-missing'
+                bat "docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% log-analyzer pytest --cov=app --cov-report=term-missing"
             }
         }
     }

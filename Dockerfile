@@ -3,13 +3,9 @@ FROM python:3.11-slim
 WORKDIR /app
 COPY app/ ./
 COPY requirements.txt ./
-COPY .env .env
 
 RUN pip install -r requirements.txt
 
-# Export environment variables from .env
-RUN apt-get update && apt-get install -y dos2unix && dos2unix .env
-RUN export $(grep -v '^#' .env | xargs)
 
 ENV PYTHONPATH=/app
 
