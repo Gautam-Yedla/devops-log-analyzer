@@ -48,7 +48,10 @@ pipeline {
     stages {
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t %DOCKER_IMAGE% ."
+                bat """
+                    echo Building Docker image: %DOCKER_IMAGE%
+                    docker build -t %DOCKER_IMAGE% .
+                """
             }
         }
 
@@ -62,7 +65,11 @@ pipeline {
                     )
                 ]) {
                     bat """
-                        docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% %DOCKER_IMAGE%
+                        echo Running analysis container with image: %DOCKER_IMAGE%
+                        docker run ^
+                            -e EMAIL_USER=%EMAIL_USER% ^
+                            -e EMAIL_PASS=%EMAIL_PASS% ^
+                            %DOCKER_IMAGE%
                     """
                 }
             }
@@ -78,8 +85,12 @@ pipeline {
                     )
                 ]) {
                     bat """
-                        docker run -e EMAIL_USER=%EMAIL_USER% -e EMAIL_PASS=%EMAIL_PASS% %DOCKER_IMAGE% \
-                        pytest tests/ --cov=app --cov-report=term-missing
+                        echo Running tests in container using image: %DOCKER_IMAGE%
+                        docker run ^
+                            -e EMAIL_USER=%EMAIL_USER% ^
+                            -e EMAIL_PASS=%EMAIL_PASS% ^
+                            %DOCKER_IMAGE% ^
+                            pytest tests/ --cov=app --cov-report=term-missing
                     """
                 }
             }
