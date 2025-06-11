@@ -11,7 +11,7 @@ def analyze_log(file_path):
     return errors, warnings
 
 if __name__ == "__main__":
-    path = "app/sample_logs/app.log"
+    path = "sample_logs/app.log"
     errs, warns = analyze_log(path)
     print("\n⚠️ Warnings:\n", *warns, sep="\n")
     print("\n❌ Errors:\n", *errs, sep="\n")
