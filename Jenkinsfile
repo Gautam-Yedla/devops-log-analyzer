@@ -16,5 +16,10 @@ pipeline {
                 bat 'docker run log-analyzer'
             }
         }
+        stage('Run Tests') {
+            steps {
+                bat 'docker run log-analyzer pytest --cov=app --cov-report=term-missing'
+            }
+        }
     }
 }
