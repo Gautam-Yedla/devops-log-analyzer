@@ -95,5 +95,28 @@ pipeline {
                 }
             }
         }
+        stage('Cleanup') {
+            steps {
+                bat """
+                    echo Cleaning up Docker images
+                    docker rmi %DOCKER_IMAGE%
+                """
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline completed.'
+        }
+        success {
+            echo 'Pipeline succeeded.'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
+        cleanup {
+            echo 'Cleaning up resources...'
+            bat 'docker system prune -f'
+        }
     }
 }
